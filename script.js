@@ -5,6 +5,7 @@ window.addEventListener('load', function() {
     canvas.height = 720
     let enemies = []
     let score = 0
+    let gameOver = false
 
     // Applies event listeners to keyboard & keep track of keys that are pressed down
     class InputHandler {
@@ -58,13 +59,18 @@ window.addEventListener('load', function() {
             this.weight = 1
         }
         draw(context) {
-            context.strokeStyle = 'white'
-            context.strokeRect(this.x, this.y, this.width, this.height)
-            // context.fillStyle = 'white'
-            // context.fillRect(this.x, this.y, this.width, this.height)
             context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height)
         }
-        update(input, deltaTime) {
+        update(input, deltaTime, enemies) {
+            // collision detection
+            enemies.forEach(enemy => {
+                const dx = (enemy.x + enemy.width/2) - (this.x + this.width/2)
+                const dy = (enemy.y + enemy.height/2) - (this.y + this.height/2)
+                const distance = Math.sqrt(dx * dx + dy * dy)
+                if(distance < enemy.width/2 + this.width/2) {
+                    gameOver = true
+                }
+            })
             //sprite animation
             if(this.frameTimer > this.frameInterval) {
                 if(this.frameX >= this.maxFrame) this.frameX = 0
@@ -153,8 +159,6 @@ window.addEventListener('load', function() {
             this.markedForDeletion = false
         }
         draw(context) {
-            context.strokeStyle = 'white'
-            context.strokeRect(this.x, this.y, this.width, this.height)
             context.drawImage(this.image, this.frameX * this.width, 0, this.width, this.height, this.x, this.y, this.width, this.height)
         }
         update(deltaTime) {
@@ -195,6 +199,14 @@ window.addEventListener('load', function() {
         context.fillText('Score: ' + score, 20, 50)
         context.fillStyle = 'white'
         context.fillText('Score: ' + score, 22, 52)
+
+        if(gameOver) {
+            context.textAlign = 'center'
+            context.fillStyle = 'black'
+            context.fillText('GAME OVER, try again!', canvas.width/2, 200)
+            context.fillStyle = 'white'
+            context.fillText('GAME OVER, try again!', canvas.width/2, 202)
+        }
     }
 
     const input = new InputHandler()
@@ -215,13 +227,13 @@ window.addEventListener('load', function() {
         background.draw(ctx)
         background.update()
         player.draw(ctx)
-        player.update(input, deltaTime)
+        player.update(input, deltaTime, enemies)
 
         handleEnemies(deltaTime)
         displayStatusText(ctx)
 
         // this function automatically passes timeStamp as arg to animate.
-        requestAnimationFrame(animate)
+        if(!gameOver) requestAnimationFrame(animate)
     }
 
     animate(0)
