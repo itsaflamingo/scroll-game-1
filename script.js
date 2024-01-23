@@ -39,7 +39,7 @@ window.addEventListener('load', function() {
             window.addEventListener('touchmove', e => {
                 // Calculates distance between touchstart and where touch is currently
                 const swipeDistance = e.changedTouches[0].pageY - this.touchY
-                if(swipeDistance < -this.touchThreshold && this.keys.indexOf('swipe up') === -1) this.push('swipe up') 
+                if(swipeDistance < -this.touchThreshold && this.keys.indexOf('swipe up') === -1) this.keys.push('swipe up') 
                 else if (swipeDistance > this.touchThreshold && this.keys.indexOf('swipe down') === -1) {
                     this.keys.push('swipe down') 
                     if(gameOver) restartGame()
@@ -109,7 +109,7 @@ window.addEventListener('load', function() {
                 this.speed = 5
             } else if (input.keys.indexOf('ArrowLeft') > -1) {
                 this.speed = -5
-            } else if(input.keys.indexOf('ArrowUp') > -1 && this.onGround()) {
+            } else if((input.keys.indexOf('ArrowUp') > -1 || input.keys.indexOf('swipe up') > -1) && this.onGround()) {
                 this.vy -= 30
             } else {
                 this.speed = 0
@@ -231,9 +231,9 @@ window.addEventListener('load', function() {
         if(gameOver) {
             context.textAlign = 'center'
             context.fillStyle = 'black'
-            context.fillText('GAME OVER, press Enter to restart!', canvas.width/2, 200)
+            context.fillText('GAME OVER, press Enter or swipe down to restart!', canvas.width/2, 200)
             context.fillStyle = 'white'
-            context.fillText('GAME OVER, press Enter to restart!', canvas.width/2, 202)
+            context.fillText('GAME OVER, press Enter or swipe down to restart!', canvas.width/2, 202)
         }
     }
 
